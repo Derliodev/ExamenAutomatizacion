@@ -4,7 +4,7 @@ pipeline {
     stages {
         stage('Clonar Repositorio') {
             steps {
-                bat 'git clone https://github.com/GafuDev/Examen-Automatizacion.git'
+                bat 'git clone https://github.com/Derliodev/ExamenAutomatizacion.git'
 
             }
         }
