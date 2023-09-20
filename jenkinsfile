@@ -1,0 +1,58 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Checkout') {
+            steps {
+                // Clonar el repositorio Git
+                checkout([$class: 'GitSCM', branches: [[name: '*/main']], doGenerateSubmoduleConfigurations: false, extensions: [], submoduleCfg: [], userRemoteConfigs: [[url: 'https://github.com/GafuDev/Examen-Automatizacion.git']]])
+            }
+        }
+
+        stage('Build') {
+            steps {
+                // Compilar el proyecto (Ejemplo: utilizando Maven)
+                sh 'mvn clean install'
+            }
+        }
+
+        stage('Unit Tests') {
+            steps {
+                // Ejecutar las pruebas unitarias (Ejemplo: utilizando Maven y JUnit)
+                sh 'mvn test'
+
+                // Archivar los resultados de las pruebas unitarias
+                junit '**/target/surefire-reports/*.xml'
+            }
+        }
+
+        stage('Ingreso Usuario Exitoso') {
+            steps {
+                // Ejecutar la prueba de ingreso de usuario exitoso
+                sh 'mvn -Dtest=IngresoUsuarioExitosoTest test'
+
+                // Archivar los resultados de la prueba
+                junit '**/target/surefire-reports/IngresoUsuarioExitosoTest.xml'
+            }
+        }
+
+        stage('Ingreso Usuario Erróneo') {
+            steps {
+                // Ejecutar la prueba de ingreso de usuario con datos erróneos
+                sh 'mvn -Dtest=IngresoUsuarioErroneoTest test'
+
+                // Archivar los resultados de la prueba
+                junit '**/target/surefire-reports/IngresoUsuarioErroneoTest.xml'
+            }
+        }
+    }
+
+    post {
+        always {
+            // Publicar informes de JUnit y archivos generados
+            archiveArtifacts artifacts: '**/target/*.jar', allowEmptyArchive: true
+            junit '**/target/surefire-reports/*.xml'
+        }
+    }
+}
+

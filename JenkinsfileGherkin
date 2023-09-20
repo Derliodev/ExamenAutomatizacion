@@ -1,0 +1,26 @@
+pipeline {
+    agent any
+
+    stages {
+        stage('Clone Repository') {
+            steps {
+                checkout scm
+            }
+        }
+
+        stage('Build and Test') {
+            steps {
+                sh 'mvn clean test'
+            }
+        }
+    }
+
+    post {
+        success {
+            echo '¡Pruebas exitosas!'
+        }
+        failure {
+            echo '¡Pruebas fallidas!'
+        }
+    }
+}
